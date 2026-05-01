@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FinancieraBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b90b8be296db586441e048d441d59c01e2b189d9")]
 [assembly: System.Reflection.AssemblyProductAttribute("FinancieraBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FinancieraBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

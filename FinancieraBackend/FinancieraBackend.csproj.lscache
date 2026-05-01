@@ -55,8 +55,41 @@ TemporaryDependencyNodeTargetIdentifier=net10.0
 /warnaserror+:NU1605,SYSLIB0011
 
 [sourceFiles]
+Application/Services/
+ AuditLogService.cs
+ AuthService.cs
+ ConsensusRequestService.cs
+ FinancialGroupService.cs
+ GroupMemberService.cs
+ PersonService.cs
+ TransactionsService.cs
+ UserService.cs
+Controllers/
+ AuditLogsController.cs
+ AuthController.cs
+ ConsensusRequestsController.cs
+ FinancialGroupsController.cs
+ GroupMembersController.cs
+ PersonsController.cs
+ TransactionsController.cs
+ UsersController.cs
+Domain/DTOs/
+ AuditLogDTOs.cs
+ AuthDTOs.cs
+ ConsensusRequestDTOs.cs
+ FinancialGroupDTOs.cs
+ GroupMemberDTOs.cs
+ PersonDTOs.cs
+ TransactionDTOs.cs
+ UserDTOs.cs
 Domain/Interfaces/
+ IAuditLogService.cs
  IAuthService.cs
+ IConsensusRequestService.cs
+ IFinancialGroupService.cs
+ IGroupMemberService.cs
+ IPersonService.cs
+ ITransactionsService.cs
  IUserService.cs
 Domain/Models/
  AuditLogs.cs
@@ -67,6 +100,7 @@ Domain/Models/
  Transactions.cs
  Users.cs
 Infrastructure/DBConnection.cs
+Middlewares/GlobalExceptionMiddleware.cs
 Migrations/
  20260425065229_InitialCreate.cs
  20260425065229_InitialCreate.Designer.cs
