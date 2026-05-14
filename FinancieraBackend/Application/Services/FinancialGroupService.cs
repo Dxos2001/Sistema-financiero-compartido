@@ -2,6 +2,7 @@ using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Domain.Models;
 using FinancieraBackend.Domain.DTOs;
 using FinancieraBackend.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancieraBackend.Application.Services
 {
@@ -14,34 +15,57 @@ namespace FinancieraBackend.Application.Services
             _context = context;
         }
 
-        public Task<FinancialGroups> CreateGroupAsync(CreateFinancialGroupDTO dto)
+        public async Task<FinancialGroups> CreateGroupAsync(CreateFinancialGroupDTO dto)
         {
-            throw new NotImplementedException();
+            var group = new FinancialGroups
+            {
+                Name = dto.Name,
+                CreatedBy = dto.CreatedBy,
+                Balance = 0.00m,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.FinancialGroups.Add(group);
+            await _context.SaveChangesAsync();
+
+            return group;
         }
 
-        public Task<bool> DeleteGroupAsync(int id)
+        public async Task<bool> DeleteGroupAsync(int id)
         {
-            throw new NotImplementedException();
+            var group = await _context.FinancialGroups.FindAsync(id);
+            if (group == null) return false;
+
+            _context.FinancialGroups.Remove(group);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<List<FinancialGroups>> GetAllGroupsAsync()
+        public async Task<List<FinancialGroups>> GetAllGroupsAsync()
         {
-            throw new NotImplementedException();
+            return await _context.FinancialGroups.ToListAsync();
         }
 
-        public Task<FinancialGroups> GetGroupAsync(int id)
+        public async Task<FinancialGroups> GetGroupAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.FinancialGroups.FindAsync(id);
         }
 
-        public Task<bool> GroupExistsAsync(int id)
+        public async Task<bool> GroupExistsAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.FinancialGroups.AnyAsync(g => g.Id == id);
         }
 
-        public Task<bool> UpdateGroupAsync(int id, UpdateFinancialGroupDTO dto)
+        public async Task<bool> UpdateGroupAsync(int id, UpdateFinancialGroupDTO dto)
         {
-            throw new NotImplementedException();
+            var group = await _context.FinancialGroups.FindAsync(id);
+            if (group == null) return false;
+
+            group.Name = dto.Name;
+
+            _context.FinancialGroups.Update(group);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

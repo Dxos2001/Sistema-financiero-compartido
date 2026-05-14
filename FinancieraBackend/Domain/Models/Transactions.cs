@@ -28,7 +28,6 @@ namespace FinancieraBackend.Domain.Models
         // Navigation
         public FinancialGroups Group { get; set; }
         public Users User { get; set; }
-        public ICollection<ConsensusRequests> ConsensusRequests { get; set; }
         public ICollection<AuditLogs> AuditLogs { get; set; }
     }
 

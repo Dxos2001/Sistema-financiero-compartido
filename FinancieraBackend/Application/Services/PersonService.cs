@@ -2,6 +2,7 @@ using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Domain.Models;
 using FinancieraBackend.Domain.DTOs;
 using FinancieraBackend.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancieraBackend.Application.Services
 {
@@ -14,34 +15,67 @@ namespace FinancieraBackend.Application.Services
             _context = context;
         }
 
-        public Task<Persons> CreatePersonAsync(CreatePersonDTO dto)
+        public async Task<Persons> CreatePersonAsync(CreatePersonDTO dto)
         {
-            throw new NotImplementedException();
+            var person = new Persons
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                MiddleName = dto.MiddleName,
+                DateOfBirth = dto.DateOfBirth,
+                IdentificationNumber = dto.IdentificationNumber,
+                Phone = dto.Phone,
+                Address = dto.Address,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Persons.Add(person);
+            await _context.SaveChangesAsync();
+
+            return person;
         }
 
-        public Task<bool> DeletePersonAsync(string identityNumber)
+        public async Task<bool> DeletePersonAsync(string identityNumber)
         {
-            throw new NotImplementedException();
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentificationNumber == identityNumber);
+            if (person == null) return false;
+
+            _context.Persons.Remove(person);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<List<Persons>> GetAllPersonsAsync()
+        public async Task<List<Persons>> GetAllPersonsAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Persons.ToListAsync();
         }
 
-        public Task<Persons> GetPersonAsync(string identityNumber)
+        public async Task<Persons> GetPersonAsync(string identityNumber)
         {
-            throw new NotImplementedException();
+            return await _context.Persons.FirstOrDefaultAsync(p => p.IdentificationNumber == identityNumber);
         }
 
-        public Task<bool> PersonExistsAsync(string identityNumber)
+        public async Task<bool> PersonExistsAsync(string identityNumber)
         {
-            throw new NotImplementedException();
+            return await _context.Persons.AnyAsync(p => p.IdentificationNumber == identityNumber);
         }
 
-        public Task<bool> UpdatePersonAsync(string identityNumber, UpdatePersonDTO dto)
+        public async Task<bool> UpdatePersonAsync(string identityNumber, UpdatePersonDTO dto)
         {
-            throw new NotImplementedException();
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentificationNumber == identityNumber);
+            if (person == null) return false;
+
+            person.FirstName = dto.FirstName;
+            person.LastName = dto.LastName;
+            person.MiddleName = dto.MiddleName;
+            person.DateOfBirth = dto.DateOfBirth;
+            person.IdentificationNumber = dto.IdentificationNumber;
+            person.Phone = dto.Phone;
+            person.Address = dto.Address;
+
+            _context.Persons.Update(person);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

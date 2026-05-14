@@ -2,6 +2,7 @@ using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Domain.Models;
 using FinancieraBackend.Domain.DTOs;
 using FinancieraBackend.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancieraBackend.Application.Services
 {
@@ -14,24 +15,37 @@ namespace FinancieraBackend.Application.Services
             _context = context;
         }
 
-        public Task<AuditLogs> CreateLogAsync(CreateAuditLogDTO dto)
+        public async Task<AuditLogs> CreateLogAsync(CreateAuditLogDTO dto)
         {
-            throw new NotImplementedException();
+            var auditLog = new AuditLogs
+            {
+                TransactionId = dto.TransactionId,
+                Action = dto.Action,
+                HashIntegrity = dto.HashIntegrity,
+                Timestamp = DateTime.UtcNow
+            };
+
+            _context.AuditLogs.Add(auditLog);
+            await _context.SaveChangesAsync();
+
+            return auditLog;
         }
 
-        public Task<List<AuditLogs>> GetAllLogsAsync()
+        public async Task<List<AuditLogs>> GetAllLogsAsync()
         {
-            throw new NotImplementedException();
+            return await _context.AuditLogs.ToListAsync();
         }
 
-        public Task<AuditLogs> GetLogAsync(int id)
+        public async Task<AuditLogs> GetLogAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.AuditLogs.FindAsync(id);
         }
 
-        public Task<List<AuditLogs>> GetLogsByTransactionAsync(int transactionId)
+        public async Task<List<AuditLogs>> GetLogsByTransactionAsync(int transactionId)
         {
-            throw new NotImplementedException();
+            return await _context.AuditLogs
+                .Where(a => a.TransactionId == transactionId)
+                .ToListAsync();
         }
     }
 }

@@ -31,6 +31,5 @@ namespace FinancieraBackend.Domain.Models
         public ICollection<FinancialGroups> CreatedGroups { get; set; }
         public ICollection<GroupMembers> GroupMemberships { get; set; }
         public ICollection<Transactions> Transactions { get; set; }
-        public ICollection<ConsensusRequests> RequestedConsensus { get; set; }
     }
 }

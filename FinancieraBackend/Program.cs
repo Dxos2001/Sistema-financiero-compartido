@@ -28,7 +28,6 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFinancialGroupService, FinancialGroupService>();
 builder.Services.AddScoped<IGroupMemberService, GroupMemberService>();
 builder.Services.AddScoped<ITransactionsService, TransactionsService>();
-builder.Services.AddScoped<IConsensusRequestService, ConsensusRequestService>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 

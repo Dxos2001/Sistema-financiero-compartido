@@ -53,46 +53,6 @@ namespace FinancieraBackend.Migrations
                     b.ToTable("AuditLogs");
                 });
 
-            modelBuilder.Entity("FinancieraBackend.Domain.Models.ConsensusRequests", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Action")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ApproverId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("RequestedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("RequestedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ResolvedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TransactionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApproverId");
-
-                    b.HasIndex("RequestedBy");
-
-                    b.HasIndex("TransactionId");
-
-                    b.ToTable("ConsensusRequests");
-                });
-
             modelBuilder.Entity("FinancieraBackend.Domain.Models.FinancialGroups", b =>
                 {
                     b.Property<int>("Id")
@@ -263,30 +223,6 @@ namespace FinancieraBackend.Migrations
                     b.Navigation("Transaction");
                 });
 
-            modelBuilder.Entity("FinancieraBackend.Domain.Models.ConsensusRequests", b =>
-                {
-                    b.HasOne("FinancieraBackend.Domain.Models.Users", null)
-                        .WithMany()
-                        .HasForeignKey("ApproverId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("FinancieraBackend.Domain.Models.Users", "RequestedByUser")
-                        .WithMany("RequestedConsensus")
-                        .HasForeignKey("RequestedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("FinancieraBackend.Domain.Models.Transactions", "Transaction")
-                        .WithMany("ConsensusRequests")
-                        .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("RequestedByUser");
-
-                    b.Navigation("Transaction");
-                });
-
             modelBuilder.Entity("FinancieraBackend.Domain.Models.FinancialGroups", b =>
                 {
                     b.HasOne("FinancieraBackend.Domain.Models.Users", "Creator")
@@ -362,8 +298,6 @@ namespace FinancieraBackend.Migrations
             modelBuilder.Entity("FinancieraBackend.Domain.Models.Transactions", b =>
                 {
                     b.Navigation("AuditLogs");
-
-                    b.Navigation("ConsensusRequests");
                 });
 
             modelBuilder.Entity("FinancieraBackend.Domain.Models.Users", b =>
@@ -371,8 +305,6 @@ namespace FinancieraBackend.Migrations
                     b.Navigation("CreatedGroups");
 
                     b.Navigation("GroupMemberships");
-
-                    b.Navigation("RequestedConsensus");
 
                     b.Navigation("Transactions");
                 });

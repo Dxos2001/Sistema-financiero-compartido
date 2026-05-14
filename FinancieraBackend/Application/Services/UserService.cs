@@ -2,6 +2,7 @@ using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Domain.Models;
 using FinancieraBackend.Domain.DTOs;
 using FinancieraBackend.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancieraBackend.Application.Services
 {
@@ -14,34 +15,59 @@ namespace FinancieraBackend.Application.Services
             _context = context;
         }
 
-        public Task<Users> CreateUserAsync(CreateUserDTO dto)
+        public async Task<Users> CreateUserAsync(CreateUserDTO dto)
         {
-            throw new NotImplementedException();
+            // Note: El modelo Users actual no tiene propiedad Password mapeada, 
+            // asumimos que será agregada o manejada luego.
+            var user = new Users
+            {
+                Username = dto.Username,
+                Email = dto.Email,
+                PersonId = dto.PersonId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return user;
         }
 
-        public Task<bool> DeleteUserAsync(string username)
+        public async Task<bool> DeleteUserAsync(string username)
         {
-            throw new NotImplementedException();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return false;
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<List<Users>> GetAllUsersAsync()
+        public async Task<List<Users>> GetAllUsersAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Users.ToListAsync();
         }
 
-        public Task<Users> GetUserAsync(string username)
+        public async Task<Users> GetUserAsync(string username)
         {
-            throw new NotImplementedException();
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
 
-        public Task<bool> UpdateUserAsync(string username, UpdateUserDTO dto)
+        public async Task<bool> UpdateUserAsync(string username, UpdateUserDTO dto)
         {
-            throw new NotImplementedException();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return false;
+
+            user.Email = dto.Email;
+            
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<bool> UserExistsAsync(string username)
+        public async Task<bool> UserExistsAsync(string username)
         {
-            throw new NotImplementedException();
+            return await _context.Users.AnyAsync(u => u.Username == username);
         }
     }
 }

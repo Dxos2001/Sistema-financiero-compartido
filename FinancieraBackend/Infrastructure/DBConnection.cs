@@ -26,7 +26,6 @@ namespace FinancieraBackend.Infrastructure
         public DbSet<FinancialGroups> FinancialGroups { get; set; }
         public DbSet<GroupMembers> GroupMembers { get; set; }
         public DbSet<Transactions> Transactions { get; set; }
-        public DbSet<ConsensusRequests> ConsensusRequests { get; set; }
         public DbSet<AuditLogs> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -73,24 +72,6 @@ namespace FinancieraBackend.Infrastructure
                 .WithMany(u => u.Transactions)
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ConsensusRequests>()
-                .HasOne(cr => cr.Transaction)
-                .WithMany(t => t.ConsensusRequests)
-                .HasForeignKey(cr => cr.TransactionId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<ConsensusRequests>()
-                .HasOne(cr => cr.RequestedByUser)
-                .WithMany(u => u.RequestedConsensus)
-                .HasForeignKey(cr => cr.RequestedBy)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ConsensusRequests>()
-                .HasOne<Users>()
-                .WithMany()
-                .HasForeignKey(cr => cr.ApproverId)
-                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<AuditLogs>()
                 .HasOne(al => al.Transaction)

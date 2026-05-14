@@ -2,6 +2,7 @@ using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Domain.Models;
 using FinancieraBackend.Domain.DTOs;
 using FinancieraBackend.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancieraBackend.Application.Services
 {
@@ -14,34 +15,60 @@ namespace FinancieraBackend.Application.Services
             _context = context;
         }
 
-        public Task<Transactions> CreateTransactionAsync(CreateTransactionDTO dto)
+        public async Task<Transactions> CreateTransactionAsync(CreateTransactionDTO dto)
         {
-            throw new NotImplementedException();
+            var transaction = new Transactions
+            {
+                GroupId = dto.GroupId,
+                UserId = dto.UserId,
+                Amount = dto.Amount,
+                Type = dto.Type,
+                Status = TransactionStatus.Pending,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Transactions.Add(transaction);
+            await _context.SaveChangesAsync();
+
+            return transaction;
         }
 
-        public Task<bool> DeleteTransactionAsync(int id)
+        public async Task<bool> DeleteTransactionAsync(int id)
         {
-            throw new NotImplementedException();
+            var transaction = await _context.Transactions.FindAsync(id);
+            if (transaction == null) return false;
+
+            _context.Transactions.Remove(transaction);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<List<Transactions>> GetAllTransactionsAsync()
+        public async Task<List<Transactions>> GetAllTransactionsAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Transactions.ToListAsync();
         }
 
-        public Task<Transactions> GetTransactionAsync(int id)
+        public async Task<Transactions> GetTransactionAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Transactions.FindAsync(id);
         }
 
-        public Task<bool> TransactionExistsAsync(int id)
+        public async Task<bool> TransactionExistsAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Transactions.AnyAsync(t => t.Id == id);
         }
 
-        public Task<bool> UpdateTransactionAsync(int id, UpdateTransactionDTO dto)
+        public async Task<bool> UpdateTransactionAsync(int id, UpdateTransactionDTO dto)
         {
-            throw new NotImplementedException();
+            var transaction = await _context.Transactions.FindAsync(id);
+            if (transaction == null) return false;
+
+            transaction.Amount = dto.Amount;
+            transaction.Type = dto.Type;
+
+            _context.Transactions.Update(transaction);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

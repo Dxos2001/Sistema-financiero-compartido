@@ -122,3 +122,4 @@
 /Users/alex/Documents/Sistema financiero compartido/FinancieraBackend/obj/Debug/net10.0/FinancieraBackend.pdb
 /Users/alex/Documents/Sistema financiero compartido/FinancieraBackend/obj/Debug/net10.0/FinancieraBackend.genruntimeconfig.cache
 /Users/alex/Documents/Sistema financiero compartido/FinancieraBackend/obj/Debug/net10.0/ref/FinancieraBackend.dll
+/Users/alex/Documents/Sistema financiero compartido/FinancieraBackend/obj/Debug/net10.0/FinancieraBackend.sourcelink.json
