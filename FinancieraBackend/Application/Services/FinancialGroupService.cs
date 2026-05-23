@@ -43,12 +43,39 @@ namespace FinancieraBackend.Application.Services
 
         public async Task<List<FinancialGroups>> GetAllGroupsAsync()
         {
-            return await _context.FinancialGroups.ToListAsync();
+            var groups = await _context.FinancialGroups.ToListAsync();
+
+            var balances = await _context.Transactions
+                .GroupBy(t => t.GroupId)
+                .Select(g => new
+                {
+                    GroupId = g.Key,
+                    Income = g.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount),
+                    Expense = g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount)
+                })
+                .ToDictionaryAsync(x => x.GroupId, x => x.Income - x.Expense);
+
+            foreach (var g in groups)
+            {
+                if (balances.TryGetValue(g.Id, out decimal balance))
+                    g.Balance = balance;
+                else
+                    g.Balance = 0;
+            }
+
+            return groups;
         }
 
         public async Task<FinancialGroups> GetGroupAsync(int id)
         {
-            return await _context.FinancialGroups.FindAsync(id);
+            var group = await _context.FinancialGroups.FindAsync(id);
+            if (group != null)
+            {
+                var income = await _context.Transactions.Where(t => t.GroupId == id && t.Type == TransactionType.Income).SumAsync(t => t.Amount);
+                var expense = await _context.Transactions.Where(t => t.GroupId == id && t.Type == TransactionType.Expense).SumAsync(t => t.Amount);
+                group.Balance = income - expense;
+            }
+            return group;
         }
 
         public async Task<bool> GroupExistsAsync(int id)

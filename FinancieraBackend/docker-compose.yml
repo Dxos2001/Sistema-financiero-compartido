@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  backend:
+    image: financiera_backend:latest  # <--- ESTO SOLUCIONA EL ERROR DEL FORMULARIO
+    build: 
+      context: /DATA/AppData/financiera-backend/FinancieraBackend
+      dockerfile: Dockerfile
+    container_name: financiera_backend
+    restart: always
+    ports:
+      - "4323:4323"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:4323
+      - ConnectionStrings__MySqlConnection=Server=192.168.18.2;Port=3306;Database=db_financiera;User Id=admin_financiera;Password=admfinanciera;
+      - DeepSeek__ApiKey=sk-f30fd189e09b40d9a8e69ec0984eaf50

@@ -64,11 +64,17 @@ namespace FinancieraBackend.Migrations
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(15,2)");
 
+                    b.Property<string>("CachedProjection")
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
+
+                    b.Property<decimal?>("LastProjectionBalance")
+                        .HasColumnType("decimal(15,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()

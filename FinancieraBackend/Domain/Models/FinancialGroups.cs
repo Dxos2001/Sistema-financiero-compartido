@@ -24,6 +24,12 @@ namespace FinancieraBackend.Domain.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+        [Column(TypeName = "longtext")]
+        public string? CachedProjection { get; set; }
+
+        [Column(TypeName = "decimal(15,2)")]
+        public decimal? LastProjectionBalance { get; set; }
+
         // Navigation
         public ICollection<GroupMembers> Members { get; set; }
         public ICollection<Transactions> Transactions { get; set; }

@@ -21,7 +21,7 @@ ProjectAssetsFile=<PATH>obj/project.assets.json
 RootNamespace=FinancieraBackend
 RunAnalyzers=
 RunAnalyzersDuringLiveAnalysis=
-SolutionPath=<PATH>FinancieraBackend.sln
+SolutionPath=<PATH>../FinancieraBackend.sln
 TargetFrameworkIdentifier=.NETCoreApp
 TargetPath=<PATH>bin/Debug/net10.0/FinancieraBackend.dll
 TargetRefPath=<PATH>obj/Debug/net10.0/ref/FinancieraBackend.dll
@@ -58,7 +58,7 @@ TemporaryDependencyNodeTargetIdentifier=net10.0
 Application/Services/
  AuditLogService.cs
  AuthService.cs
- ConsensusRequestService.cs
+ DeepSeekProjectionService.cs
  FinancialGroupService.cs
  GroupMemberService.cs
  PersonService.cs
@@ -67,33 +67,32 @@ Application/Services/
 Controllers/
  AuditLogsController.cs
  AuthController.cs
- ConsensusRequestsController.cs
  FinancialGroupsController.cs
  GroupMembersController.cs
  PersonsController.cs
+ ProjectionsController.cs
  TransactionsController.cs
  UsersController.cs
 Domain/DTOs/
  AuditLogDTOs.cs
  AuthDTOs.cs
- ConsensusRequestDTOs.cs
  FinancialGroupDTOs.cs
  GroupMemberDTOs.cs
  PersonDTOs.cs
+ ProjectionDTOs.cs
  TransactionDTOs.cs
  UserDTOs.cs
 Domain/Interfaces/
  IAuditLogService.cs
  IAuthService.cs
- IConsensusRequestService.cs
  IFinancialGroupService.cs
  IGroupMemberService.cs
  IPersonService.cs
+ IProjectionService.cs
  ITransactionsService.cs
  IUserService.cs
 Domain/Models/
  AuditLogs.cs
- ConsensusRequests.cs
  FinancialGroups.cs
  GroupMembers.cs
  Persons.cs
@@ -110,6 +109,8 @@ Migrations/
  20260425065811_AddPersonasTable.Designer.cs
  20260425065908_changePersonasXPersons.cs
  20260425065908_changePersonasXPersons.Designer.cs
+ 20260509005449_RemoveConsensusRequests.cs
+ 20260509005449_RemoveConsensusRequests.Designer.cs
  DBConnectionModelSnapshot.cs
 obj/Debug/net10.0/
  .NETCoreApp,Version=v10.0.AssemblyAttributes.cs

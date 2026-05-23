@@ -1,0 +1,10 @@
+bin/
+obj/
+.git/
+.vscode/
+*.user
+*.suo
+*.userprefs
+.idea/
+.DS_Store
+appsettings.Development.json

@@ -37,6 +37,17 @@ namespace FinancieraBackend.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Returns all users that are members of the given group.
+        /// Used by the frontend to populate the User combobox after a group is selected.
+        /// </summary>
+        [HttpGet("group/{groupId}")]
+        public async Task<ActionResult<List<Users>>> GetByGroup(int groupId)
+        {
+            var result = await _userService.GetUsersByGroupAsync(groupId);
+            return Ok(result);
+        }
+
         [HttpPut("{username}")]
         public async Task<ActionResult<bool>> Update(string username, [FromBody] UpdateUserDTO dto)
         {

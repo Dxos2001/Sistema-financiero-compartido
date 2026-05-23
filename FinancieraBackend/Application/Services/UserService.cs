@@ -69,5 +69,15 @@ namespace FinancieraBackend.Application.Services
         {
             return await _context.Users.AnyAsync(u => u.Username == username);
         }
+
+        public async Task<List<Users>> GetUsersByGroupAsync(int groupId)
+        {
+            return await _context.GroupMembers
+                .Where(gm => gm.GroupId == groupId)
+                .Include(gm => gm.User)
+                    .ThenInclude(u => u.Person)
+                .Select(gm => gm.User)
+                .ToListAsync();
+        }
     }
 }
