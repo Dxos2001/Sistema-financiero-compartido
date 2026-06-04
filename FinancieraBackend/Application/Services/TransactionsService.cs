@@ -16,7 +16,7 @@ namespace FinancieraBackend.Application.Services
             _context = context;
         }
 
-        public async Task<Transactions> CreateTransactionAsync(CreateTransactionDTO dto)
+        public async Task<Transactions> CreateTransactionAsync(CreateTransactionDTO dto, Role creatorRole)
         {
             var transaction = new Transactions
             {
@@ -24,7 +24,7 @@ namespace FinancieraBackend.Application.Services
                 UserId = dto.UserId,
                 Amount = dto.Amount,
                 Type = dto.Type,
-                Status = TransactionStatus.Pending,
+                Status = creatorRole == Role.Admin ? TransactionStatus.Approved : TransactionStatus.Pending,
                 CreatedAt = DateTime.UtcNow
             };
 

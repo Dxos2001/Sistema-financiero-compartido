@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Domain.DTOs;
 using FinancieraBackend.Domain.Models;
+using FinancieraBackend.Extensions;
 
 namespace FinancieraBackend.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class GroupMembersController : ControllerBase
@@ -19,6 +22,12 @@ namespace FinancieraBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<GroupMembers>> Add([FromBody] AddGroupMemberDTO dto)
         {
+            var currentUserId = User.GetUserId();
+            var currentUserRole = await _memberService.GetUserRoleInGroupAsync(dto.GroupId, currentUserId);
+
+            if (currentUserRole != Role.Admin)
+                return Forbid();
+
             var result = await _memberService.AddMemberAsync(dto);
             return Ok(result);
         }
@@ -26,6 +35,13 @@ namespace FinancieraBackend.Controllers
         [HttpDelete("{groupId}/{userId}")]
         public async Task<ActionResult<bool>> Remove(int groupId, int userId)
         {
+            var currentUserId = User.GetUserId();
+            var currentUserRole = await _memberService.GetUserRoleInGroupAsync(groupId, currentUserId);
+
+            // Un Admin puede eliminar a otros. Un usuario también puede eliminarse a sí mismo (salir del grupo).
+            if (currentUserRole != Role.Admin && currentUserId != userId)
+                return Forbid();
+
             var result = await _memberService.RemoveMemberAsync(groupId, userId);
             return Ok(result);
         }
@@ -33,6 +49,12 @@ namespace FinancieraBackend.Controllers
         [HttpPut("{groupId}/{userId}/role")]
         public async Task<ActionResult<bool>> UpdateRole(int groupId, int userId, [FromBody] UpdateGroupMemberRoleDTO dto)
         {
+            var currentUserId = User.GetUserId();
+            var currentUserRole = await _memberService.GetUserRoleInGroupAsync(groupId, currentUserId);
+
+            if (currentUserRole != Role.Admin)
+                return Forbid();
+
             var result = await _memberService.UpdateMemberRoleAsync(groupId, userId, dto);
             return Ok(result);
         }

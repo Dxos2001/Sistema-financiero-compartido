@@ -28,6 +28,16 @@ namespace FinancieraBackend.Application.Services
             _context.FinancialGroups.Add(group);
             await _context.SaveChangesAsync();
 
+            var member = new GroupMembers
+            {
+                GroupId = group.Id,
+                UserId = dto.CreatedBy,
+                Role = Role.Admin
+                // JoinedAt = DateTime.UtcNow // <-- Requiere añadir a modelo y migración
+            };
+            _context.GroupMembers.Add(member);
+            await _context.SaveChangesAsync();
+
             return group;
         }
 

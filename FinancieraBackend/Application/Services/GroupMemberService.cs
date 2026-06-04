@@ -52,6 +52,15 @@ namespace FinancieraBackend.Application.Services
                 .AnyAsync(gm => gm.GroupId == groupId && gm.UserId == userId);
         }
 
+        public async Task<Role?> GetUserRoleInGroupAsync(int groupId, int userId)
+        {
+            var member = await _context.GroupMembers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == userId);
+            
+            return member?.Role;
+        }
+
         public async Task<bool> RemoveMemberAsync(int groupId, int userId)
         {
             var member = await _context.GroupMembers

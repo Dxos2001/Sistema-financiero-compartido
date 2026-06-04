@@ -15,8 +15,16 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build-env /app/out .
 
+# Configuración para Entorno de Producción
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV TZ=America/Lima
+
 # Exponer el puerto
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
+
+# (Opcional) Ejecutar contenedor como un usuario no root para mayor seguridad
+# RUN chown -R $APP_UID:$APP_UID /app
+# USER $APP_UID
 
 ENTRYPOINT ["dotnet", "FinancieraBackend.dll"]

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Domain.DTOs;
@@ -5,6 +6,7 @@ using FinancieraBackend.Domain.Models;
 
 namespace FinancieraBackend.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase

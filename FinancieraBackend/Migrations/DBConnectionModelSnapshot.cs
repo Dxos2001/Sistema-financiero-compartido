@@ -202,6 +202,10 @@ namespace FinancieraBackend.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<string>("PasswordHash")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 

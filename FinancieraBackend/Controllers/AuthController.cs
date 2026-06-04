@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Domain.DTOs;
@@ -15,11 +16,39 @@ namespace FinancieraBackend.Controllers
             _authService = authService;
         }
 
+        /// <summary>
+        /// Autentica al usuario y devuelve un JWT.
+        /// Endpoint público — no requiere autenticación previa.
+        /// </summary>
+        [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login([FromBody] LoginDTO dto)
+        public async Task<ActionResult<AuthResponseDTO>> Login([FromBody] LoginDTO dto)
         {
-            var token = await _authService.AuthenticateAsync(dto);
-            return Ok(new { Token = token });
+            var result = await _authService.AuthenticateAsync(dto);
+
+            if (result == null)
+                return Unauthorized(new { Message = "Usuario o contraseña incorrectos." });
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Registra un nuevo usuario (crea Person + User) y devuelve un JWT.
+        /// Endpoint público — no requiere autenticación previa.
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<ActionResult<AuthResponseDTO>> Register([FromBody] RegisterDTO dto)
+        {
+            try
+            {
+                var result = await _authService.RegisterAsync(dto);
+                return CreatedAtAction(nameof(Login), result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { Message = ex.Message });
+            }
         }
     }
 }

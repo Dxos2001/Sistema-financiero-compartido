@@ -11,7 +11,9 @@ services:
     ports:
       - "4323:4323"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
+      - TZ=America/Lima
       - ASPNETCORE_URLS=http://+:4323
       - ConnectionStrings__MySqlConnection=Server=192.168.18.2;Port=3306;Database=db_financiera;User Id=admin_financiera;Password=admfinanciera;
-      - DeepSeek__ApiKey=sk-f30fd189e09b40d9a8e69ec0984eaf50
+      - DeepSeek__ApiKey=ollama
+      - JwtSettings__Key=my_super_secret_key_12345_min_32_chars!!

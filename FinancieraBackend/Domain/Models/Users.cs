@@ -22,6 +22,14 @@ namespace FinancieraBackend.Domain.Models
         [Required]
         public int PersonId { get; set; }
 
+        /// <summary>
+        /// Hash SHA-256 de la contraseña del usuario.
+        /// Es nullable porque cuando se migre a AWS IAM (UseAwsIam=true),
+        /// la autenticación será delegada a IAM y este campo no se utilizará.
+        /// </summary>
+        [MaxLength(256)]
+        public string? PasswordHash { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation properties

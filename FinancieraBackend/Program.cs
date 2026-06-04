@@ -1,13 +1,18 @@
+using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Constraints;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using MySqlConnector;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql;
 using FinancieraBackend.Infrastructure;
 using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Application.Services;
+
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -16,17 +21,48 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// ── OpenAPI / Swagger ─────────────────────────────────────────────────────────
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Financiera Backend", Version = "v1" });
 
-builder.Services.AddSwaggerGen();
+    const string bearerSchemeId = "Bearer";
+
+    // Habilitar el botón "Authorize" en Swagger UI para enviar el JWT
+    // Nota: Swashbuckle 10.x + Microsoft.OpenApi 2.x usan delegate en AddSecurityRequirement
+    // y los tipos están en el namespace raíz Microsoft.OpenApi (sin .Models)
+    c.AddSecurityDefinition(bearerSchemeId, new OpenApiSecurityScheme
+    {
+        Name         = "Authorization",
+        Type         = SecuritySchemeType.Http,
+        Scheme       = "bearer",       // minúsculas según RFC 7235
+        BearerFormat = "JWT",
+        In           = ParameterLocation.Header,
+        Description  = "Ingrese el token JWT. Ejemplo: Bearer {token}"
+    });
+
+    c.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference(bearerSchemeId),
+            new List<string>()
+        }
+    });
+});
+
 builder.Services.AddOpenApi();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
-builder.Services.AddDbContext<DBConnection>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("MySqlConnection"), new MySqlServerVersion(new Version(8, 0, 21))));
 
+// ── Base de datos ─────────────────────────────────────────────────────────────
+builder.Services.AddDbContext<DBConnection>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("MySqlConnection"),
+        new MySqlServerVersion(new Version(8, 0, 21))));
+
+// ── Servicios de aplicación ───────────────────────────────────────────────────
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFinancialGroupService, FinancialGroupService>();
@@ -37,7 +73,47 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IProjectionService, DeepSeekProjectionService>();
 
-builder.Services.Configure<RouteOptions>(options => options.SetParameterPolicy<RegexInlineRouteConstraint>("regex"));
+// ── Autenticación JWT ─────────────────────────────────────────────────────────
+// La clave secreta se lee desde JwtSettings:Key.
+// En producción, configúrala en User Secrets o en variables de entorno,
+// NUNCA en el appsettings.json del repositorio.
+//
+// El secret de AWS IAM se almacena en User Secrets bajo la clave "IAMSecret".
+// Cuando UseAwsIam = true en appsettings.json, AuthService delega la
+// autenticación a AWS IAM usando esa clave.
+var jwtKey    = builder.Configuration["JwtSettings:Key"]!;
+var issuer    = builder.Configuration["JwtSettings:Issuer"]!;
+var audience  = builder.Configuration["JwtSettings:Audience"]!;
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer           = true,
+            ValidateAudience         = true,
+            ValidateLifetime         = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer              = issuer,
+            ValidAudience            = audience,
+            IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew                = TimeSpan.Zero   // Sin margen de tiempo extra
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("=== JWT AUTH FAILED ===");
+                Console.WriteLine(context.Exception.ToString());
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+builder.Services.Configure<RouteOptions>(options =>
+    options.SetParameterPolicy<RegexInlineRouteConstraint>("regex"));
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
@@ -59,34 +135,41 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// ── Ejecutar Migraciones Pendientes (Para Producción / Docker) ────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<DBConnection>();
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            Console.WriteLine("Aplicando migraciones pendientes a la base de datos...");
+            context.Database.Migrate();
+            Console.WriteLine("Migraciones aplicadas correctamente.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error al aplicar migraciones: {ex.Message}");
+    }
+}
+
+// ── Pipeline HTTP ─────────────────────────────────────────────────────────────
 app.UseMiddleware<FinancieraBackend.Middlewares.GlobalExceptionMiddleware>();
 app.UseCors("AllowFrontend");
 
-// Always expose Swagger (useful for deployed environments too)
+// Swagger siempre disponible (útil también en despliegues)
 app.UseSwagger();
 app.UseSwaggerUI();
 
+// IMPORTANTE: el orden es: Authentication → Authorization → Controllers
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
-Todo[] sampleTodos =
-[
-    new(1, "Walk the dog"),
-    new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
-    new(3, "Do the laundry", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
-    new(4, "Clean the bathroom"),
-    new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
-];
-
-var todosApi = app.MapGroup("/todos");
-todosApi.MapGet("/", () => sampleTodos)
-        .WithName("GetTodos");
-
-todosApi.MapGet("/{id}", Results<Ok<Todo>, NotFound> (int id) =>
-    sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
-        ? TypedResults.Ok(todo)
-        : TypedResults.NotFound())
-    .WithName("GetTodoById");
-
+// ── Endpoint de prueba de conexión ────────────────────────────────────────────
 app.MapGet("/test-connection", async (IConfiguration config) =>
 {
     var connectionString = config.GetConnectionString("MySqlConnection");

@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FinancieraBackend.Domain.Interfaces;
 using FinancieraBackend.Domain.DTOs;
 
 namespace FinancieraBackend.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProjectionsController : ControllerBase

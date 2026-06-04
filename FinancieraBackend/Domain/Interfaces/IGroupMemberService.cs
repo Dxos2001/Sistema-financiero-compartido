@@ -11,5 +11,6 @@ namespace FinancieraBackend.Domain.Interfaces
         Task<List<GroupMembers>> GetMembersByGroupAsync(int groupId);
         Task<List<GroupMembers>> GetGroupsByUserAsync(int userId);
         Task<bool> IsMemberAsync(int groupId, int userId);
+        Task<Role?> GetUserRoleInGroupAsync(int groupId, int userId);
     }
 }
