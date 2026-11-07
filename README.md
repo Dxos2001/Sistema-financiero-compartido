@@ -111,4 +111,4 @@ El proyecto sigue estrictamente los principios de **Clean Architecture** y **Dom
 
 ## 👤 Autor
 
-* **Alex León** — *Senior Backend Engineer* | [GitHub: @Dxos2001](https://github.com/Dxos2001)
+* **Alex León** — *Semi-Senior Backend Engineer* | [GitHub: @Dxos2001](https://github.com/Dxos2001)
